@@ -29,7 +29,7 @@ fi
 # Instalar paquetes oficiales con confirmación
 # -------------------------------
 echo "📦 Instalando paquetes oficiales..."
-sudo pacman -S ufw waybar pavucontrol stow nwg-look
+sudo pacman -S ufw waybar pavucontrol stow nwg-look starship
 
 # -------------------------------
 # Activar UFW
