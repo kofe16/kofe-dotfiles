@@ -18,12 +18,27 @@ for config in "${CONFIGS[@]}"; do
   echo "Aplicando stow para $config..."
 
   if [ "$config" == "bash" ]; then
-    stow -d "$DOTFILES_DIR" -t "$HOME" bash
+    TARGET="$HOME"
   elif [ "$config" == "sddm" ]; then
-    sudo stow -d "$DOTFILES_DIR" -t /usr/share/sddm/themes sddm
+    TARGET="/usr/share/sddm/themes"
   else
-    stow -d "$DOTFILES_DIR" -t "$HOME/.config" "$config"
+    TARGET="$HOME/.config"
+  fi
+
+  # Elimina el destino actual para evitar conflictos
+  if [ "$config" == "sddm" ]; then
+    # Para sddm se necesita sudo para eliminar
+    sudo rm -rf "$TARGET/$config"
+  else
+    rm -rf "$TARGET/$config"
+  fi
+
+  # Aplica stow
+  if [ "$config" == "sddm" ]; then
+    sudo stow -d "$DOTFILES_DIR" -t "$TARGET" "$config"
+  else
+    stow -d "$DOTFILES_DIR" -t "$TARGET" "$config"
   fi
 done
 
-echo "✅ Dotfiles aplicados."
+echo "✅ Dotfiles aplicados y sobreescritos."
