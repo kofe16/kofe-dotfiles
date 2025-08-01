@@ -29,7 +29,7 @@ fi
 # Instalar paquetes oficiales con confirmación
 # -------------------------------
 echo "📦 Instalando paquetes oficiales..."
-sudo pacman -S ufw waybar pavucontrol stow nwg-look starship
+sudo pacman -S ufw waybar pavucontrol stow nwg-look starship flatpak
 
 # -------------------------------
 # Activar UFW
@@ -44,10 +44,22 @@ echo "✨ Instalando paquetes desde AUR..."
 yay -S hyprshot swaync hyprlock hypridle hyprpaper
 
 # -------------------------------
+# Instalar fuentes
+# -------------------------------
+echo "📚 Instalando fuentes..."
+sudo pacman -S ttf-cascadia-nerd lexend-fonts-git ttf-jetbrains-mono-nerd
+
+# -------------------------------
 # Requisitos para SDDM con temas
 # -------------------------------
 echo "🎨 Instalando dependencias para temas SDDM..."
 sudo pacman -S qt5-graphicaleffects qt5-quickcontrols2
+
+# -------------------------------
+# Habilitar Flatpak
+# -------------------------------
+echo "🔧 Habilitando Flatpak..."
+sudo systemctl enable --now flatpak
 
 # -------------------------------
 # Fin
