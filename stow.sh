@@ -1,44 +1,46 @@
 #!/bin/bash
 
-DOTFILES_DIR="$HOME/kofe-dotfiles"
-
-CONFIGS=(
-  backgrounds
-  hyprland
-  fastfetch
-  waybar
-  hyprpaper
-  kitty
-  starship
-  bash
-  sddm
+# Lista de paquetes a aplicar stow
+packages=(
+    "backgrounds"
+    "hyprland"
+    "fastfetch"
+    "waybar"
+    "hyprpaper"
+    "kitty"
+    "starship"
+    "bash"
+    "sddm"
 )
 
-for config in "${CONFIGS[@]}"; do
-  echo "Aplicando stow para $config..."
-
-  if [ "$config" == "bash" ]; then
-    TARGET="$HOME"
-  elif [ "$config" == "sddm" ]; then
-    TARGET="/usr/share/sddm/themes"
-  else
-    TARGET="$HOME/.config"
-  fi
-
-  # Elimina el destino actual para evitar conflictos
-  if [ "$config" == "sddm" ]; then
-    # Para sddm se necesita sudo para eliminar
-    sudo rm -rf "$TARGET/$config"
-  else
-    rm -rf "$TARGET/$config"
-  fi
-
-  # Aplica stow
-  if [ "$config" == "sddm" ]; then
-    sudo stow -d "$DOTFILES_DIR" -t "$TARGET" "$config"
-  else
-    stow -d "$DOTFILES_DIR" -t "$TARGET" "$config"
-  fi
+# Aplicar stow a cada paquete
+for package in "${packages[@]}"; do
+    if [ -d "$package" ]; then
+        echo "Aplicando stow a $package..."
+        stow "$package"
+    else
+        echo "El directorio $package no existe."
+    fi
 done
 
-echo "✅ Dotfiles aplicados y sobreescritos."
+# Manejar sddm por separado
+
+sddm_dir="sddm"
+
+if [ -d "$sddm_dir" ]; then
+
+    echo "Moviendo $sddm_dir a /usr/share/sddm/themes..."
+
+    sudo cp -r "$sddm_dir"/* /usr/share/sddm/themes/
+
+    sudo chown -R root:root /usr/share/sddm/themes/*
+
+    sudo chmod -R 755 /usr/share/sddm/themes/*
+
+else
+
+    echo "El directorio $sddm_dir no existe."
+
+fi
+
+echo "Proceso completado."
