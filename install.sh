@@ -2,7 +2,7 @@
 
 # -------------------------------
 # Instalador completo para entorno Hyprland
-# Incluye yay, UFW, Waybar, Hyprshot, etc.
+# Incluye yay, UFW, Waybar, Hyprshot, audio, brillo, Bluetooth, etc.
 # -------------------------------
 
 set -e  # Detener en errores
@@ -26,10 +26,12 @@ else
 fi
 
 # -------------------------------
-# Instalar paquetes oficiales con confirmación
+# Instalar paquetes oficiales
 # -------------------------------
 echo "📦 Instalando paquetes oficiales..."
-sudo pacman -S ufw waybar pavucontrol stow nwg-look starship flatpak
+sudo pacman -S ufw waybar pavucontrol stow nwg-look starship flatpak \
+  pipewire pipewire-audio pipewire-pulse wireplumber alsa-utils \
+  bluez bluez-utils brightnessctl pamixer
 
 # -------------------------------
 # Activar UFW
@@ -38,19 +40,25 @@ echo "🛡 Activando UFW..."
 sudo systemctl enable --now ufw
 
 # -------------------------------
+# Activar Bluetooth
+# -------------------------------
+echo "📶 Habilitando Bluetooth..."
+sudo systemctl enable --now bluetooth
+
+# -------------------------------
+# Activar servicios de audio PipeWire
+# -------------------------------
+echo "🔊 Habilitando servicios de audio..."
+systemctl --user enable --now wireplumber.service
+
+# -------------------------------
 # Instalar paquetes AUR con yay
 # -------------------------------
 echo "✨ Instalando paquetes desde AUR..."
 yay -S hyprshot swaync hyprlock hypridle hyprpaper
 
 # -------------------------------
-# Instalar fuentes
-# -------------------------------
-echo "📚 Instalando fuentes..."
-sudo pacman -S ttf-cascadia-nerd lexend-fonts-git ttf-jetbrains-mono-nerd
-
-# -------------------------------
-# Requisitos para SDDM con temas
+# Requisitos para temas SDDM
 # -------------------------------
 echo "🎨 Instalando dependencias para temas SDDM..."
 sudo pacman -S qt5-graphicaleffects qt5-quickcontrols2
@@ -65,4 +73,4 @@ sudo systemctl enable --now flatpak
 # Fin
 # -------------------------------
 echo ""
-echo "✅ Todo listo. ¡Entorno preparado!"
+echo "✅ Todo listo. ¡Entorno Hyprland completamente preparado con audio, brillo y Bluetooth!"

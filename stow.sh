@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# Lista de paquetes a aplicar stow
 packages=(
     "backgrounds"
     "hyprland"
@@ -13,34 +12,22 @@ packages=(
     "sddm"
 )
 
-# Aplicar stow a cada paquete
+DOTFILES_DIR="$(pwd)"
+
+cd "$DOTFILES_DIR" || { echo "No se pudo acceder a $DOTFILES_DIR"; exit 1; }
+
 for package in "${packages[@]}"; do
     if [ -d "$package" ]; then
-        echo "Aplicando stow a $package..."
-        stow "$package"
+        if [ "$package" == "sddm" ]; then
+            echo "Copiando tema SDDM a /usr/share/sddm/themes con sudo..."
+            sudo cp -r "$DOTFILES_DIR/sddm/." /usr/share/sddm/themes/
+        else
+            echo "Aplicando stow -R a $package..."
+            stow -R "$package"
+        fi
     else
-        echo "El directorio $package no existe."
+        echo "El directorio $package no existe, se omite."
     fi
 done
-
-# Manejar sddm por separado
-
-sddm_dir="sddm"
-
-if [ -d "$sddm_dir" ]; then
-
-    echo "Moviendo $sddm_dir a /usr/share/sddm/themes..."
-
-    sudo cp -r "$sddm_dir"/* /usr/share/sddm/themes/
-
-    sudo chown -R root:root /usr/share/sddm/themes/*
-
-    sudo chmod -R 755 /usr/share/sddm/themes/*
-
-else
-
-    echo "El directorio $sddm_dir no existe."
-
-fi
 
 echo "Proceso completado."
