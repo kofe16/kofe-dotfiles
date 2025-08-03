@@ -64,12 +64,6 @@ echo "🎨 Instalando dependencias para temas SDDM..."
 sudo pacman -S qt5-graphicaleffects qt5-quickcontrols2
 
 # -------------------------------
-# Habilitar Flatpak
-# -------------------------------
-echo "🔧 Habilitando Flatpak..."
-sudo systemctl enable --now flatpak
-
-# -------------------------------
 # Fin
 # -------------------------------
 echo ""
