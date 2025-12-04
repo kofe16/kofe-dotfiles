@@ -48,8 +48,8 @@ for file in "$CONFIG_DIR/sddm/themes/"*; do
         echo "Respaldando /usr/share/sddm/themes/$(basename $file)"
         sudo mv "/usr/share/sddm/themes/$(basename $file)" "$BACKUP_DIR/"
     fi
-    echo "Creando symlink SDDM theme con sudo: $(basename $file)"
-    sudo ln -sf "$file" "/usr/share/sddm/themes/$(basename $file)"
+    echo "Copiando tema SDDM: $(basename $file)"
+    sudo cp -r "$file" "/usr/share/sddm/themes/$(basename $file)"  
 done
 
 # Archivo sddm.conf
@@ -57,7 +57,7 @@ if [ -e "/etc/sddm.conf" ]; then
     echo "Respaldando /etc/sddm.conf"
     sudo mv "/etc/sddm.conf" "$BACKUP_DIR/"
 fi
-echo "Creando symlink sddm.conf con sudo"
-sudo ln -sf "$CONFIG_DIR/sddm/sddm.conf" "/etc/sddm.conf"
+echo "Copiando archivo sddm.conf con sudo"
+sudo cp "$CONFIG_DIR/sddm/sddm.conf" "/etc/sddm.conf"  
 
 echo "Dotfiles instalados. Los archivos antiguos están en $BACKUP_DIR."
