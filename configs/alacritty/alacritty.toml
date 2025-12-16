@@ -1,0 +1,11 @@
+[font]
+normal = { family = "JetBrainsMono Nerd Font", style = "Regular" }
+bold   = { family = "JetBrainsMono Nerd Font", style = "Bold" }
+size = 10
+
+[colors]
+
+# Colores primarios del terminal
+[colors.primary]
+foreground = "#ffffff"   # Texto normal en blanco
+background = "#0a1d25"

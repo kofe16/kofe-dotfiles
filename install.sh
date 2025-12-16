@@ -1,63 +1,103 @@
-#!/bin/bash
+1#!/bin/bash
+set -e
 
+########################
+# RUTAS
+########################
 CONFIG_DIR="$HOME/kofe-dotfiles/configs"
 BACKUP_DIR="$HOME/kofe-dotfiles/backups"
 
-echo "Instalando dotfiles desde $CONFIG_DIR..."
+echo "🚀 Instalando Kofe-Rice..."
 mkdir -p "$BACKUP_DIR"
 
-# Función para respaldar y crear symlink como usuario normal
-backup_and_link() {
-    local src="$1"
-    local dest="$2"
+########################
+# CHECK ARCH
+########################
+if ! command -v pacman &>/dev/null; then
+    echo "❌ Este script es solo para Arch Linux"
+    exit 1
+fi
+
+########################
+# PAQUETES
+########################
+PACKAGES=(
+    hyprland
+    hyprpaper
+    waybar
+    nwg-displays
+    brightnessctl
+    bluetui
+    ttf-jetbrains-mono-nerd
+    qt5-graphicaleffects
+    qt5-quickcontrols
+    qt5-quickcontrols2
+    fastfetch
+    flatpak
+)
+
+echo "📦 Instalando paquetes..."
+sudo pacman -S --needed --noconfirm "${PACKAGES[@]}"
+
+########################
+# FUNCIÓN BACKUP
+########################
+backup_file() {
+    local dest="$1"
 
     if [ -e "$dest" ] || [ -L "$dest" ]; then
-        echo "Moviendo $dest a $BACKUP_DIR"
-        mv "$dest" "$BACKUP_DIR/"
+        echo "📦 Respaldando $dest"
+        mv "$dest" "$BACKUP_DIR/$(basename "$dest")_backup_$(date +%s)"
     fi
-
-    echo "Creando symlink: $dest -> $src"
-    ln -sf "$src" "$dest"
 }
 
-# Hyprland configs
-mkdir -p "$HOME/.config/hypr"
-for file in "$CONFIG_DIR/hypr/"*; do
-    [ -e "$file" ] || continue
-    backup_and_link "$file" "$HOME/.config/hypr/$(basename $file)"
-done
+########################
+# SYMLINK AUTOMÁTICO
+########################
+link_all_configs() {
+    # Recorre todas las carpetas dentro de CONFIG_DIR
+    for src_dir in "$CONFIG_DIR"/*; do
+        [ -d "$src_dir" ] || continue
+        name="$(basename "$src_dir")"
+        dest_dir="$HOME/.config/$name"
 
-# Waybar configs
-mkdir -p "$HOME/.config/waybar"
-for file in "$CONFIG_DIR/waybar/"*; do
-    [ -e "$file" ] || continue
-    backup_and_link "$file" "$HOME/.config/waybar/$(basename $file)"
-done
+        backup_file "$dest_dir"
+        echo "🔗 Enlazando $dest_dir -> $src_dir"
+        ln -sfn "$src_dir" "$dest_dir"
+    done
+}
 
-# Nwg-displays configs
-mkdir -p "$HOME/.config/nwg-displays"
-for file in "$CONFIG_DIR/nwg-displays/"*; do
-    [ -e "$file" ] || continue
-    backup_and_link "$file" "$HOME/.config/nwg-displays/$(basename $file)"
-done
+########################
+# APLICAR CONFIGS
+########################
+link_all_configs
 
-# SDDM configs (system-wide, requiere sudo)
-# Themes
-for file in "$CONFIG_DIR/sddm/themes/"*; do
-    if [ -e "/usr/share/sddm/themes/$(basename $file)" ]; then
-        echo "Respaldando /usr/share/sddm/themes/$(basename $file)"
-        sudo mv "/usr/share/sddm/themes/$(basename $file)" "$BACKUP_DIR/"
-    fi
-    echo "Copiando tema SDDM: $(basename $file)"
-    sudo cp -r "$file" "/usr/share/sddm/themes/$(basename $file)"  
-done
+########################
+# SDDM
+########################
+echo "🎨 Configurando SDDM"
 
-# Archivo sddm.conf
-if [ -e "/etc/sddm.conf" ]; then
-    echo "Respaldando /etc/sddm.conf"
-    sudo mv "/etc/sddm.conf" "$BACKUP_DIR/"
+if [ -d "$CONFIG_DIR/sddm/themes" ]; then
+    for theme in "$CONFIG_DIR/sddm/themes/"*; do
+        [ -e "$theme" ] || continue
+        NAME="$(basename "$theme")"
+        if [ -e "/usr/share/sddm/themes/$NAME" ]; then
+            sudo mv "/usr/share/sddm/themes/$NAME" "$BACKUP_DIR/"
+        fi
+        sudo cp -r "$theme" /usr/share/sddm/themes/
+    done
 fi
-echo "Copiando archivo sddm.conf con sudo"
-sudo cp "$CONFIG_DIR/sddm/sddm.conf" "/etc/sddm.conf"  
 
-echo "Dotfiles instalados. Los archivos antiguos están en $BACKUP_DIR."
+if [ -e /etc/sddm.conf ]; then
+    sudo mv /etc/sddm.conf "$BACKUP_DIR/"
+fi
+
+sudo cp "$CONFIG_DIR/sddm/sddm.conf" /etc/sddm.conf
+sudo systemctl enable sddm
+
+########################
+# FINAL
+########################
+echo "✅ Kofe-Rice instalado correctamente"
+echo "📦 Backups en: $BACKUP_DIR"
+echo "🔁 Reinicia o cierra sesión"
